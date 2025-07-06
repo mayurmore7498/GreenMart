@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../services/api";
+import { useCart } from "../context/CartContext";
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -18,21 +20,40 @@ export default function ProductDetailsPage() {
     fetchProduct();
   }, [id]);
 
-  if (!product) return <p>Loading product...</p>;
+  if (!product) return <p className="text-center mt-5">Loading product...</p>;
 
   return (
-    <div className="container py-4">
-      <div className="row">
-        <div className="col-md-5">
-          <img src={product.image} alt={product.name} className="img-fluid rounded shadow" />
+    <div className="container py-5">
+      <div className="row align-items-center">
+        {/* Product Image */}
+        <div className="col-md-6 mb-4 mb-md-0">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="img-fluid rounded shadow-sm"
+            style={{ maxHeight: "450px", objectFit: "cover" }}
+          />
         </div>
-        <div className="col-md-7">
-          <h2>{product.name}</h2>
-          <p className="text-muted">{product.category}</p>
-          <p>{product.description}</p>
-          <h4>₹{product.price}</h4>
-          <p>Stock: {product.countInStock}</p>
-          <button className="btn btn-success">Add to Cart</button>
+
+        {/* Product Info */}
+        <div className="col-md-6">
+          <h2 className="fw-bold mb-3">{product.name}</h2>
+          <span className="badge bg-secondary mb-2">{product.category}</span>
+          <p className="text-muted">{product.description}</p>
+
+          <h3 className="text-success fw-bold mb-3">₹{product.price}</h3>
+
+          <p className={`fw-semibold ${product.countInStock > 0 ? "text-success" : "text-danger"}`}>
+            {product.countInStock > 0 ? "In Stock" : "Out of Stock"}
+          </p>
+
+          <button
+            className="btn btn-success px-4 py-2 mt-3"
+            onClick={() => addToCart(product)}
+            disabled={product.countInStock <= 0}
+          >
+            🛒 Add to Cart
+          </button>
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ const productSchema = new mongoose.Schema(
     category: String,
     description: String,
     image: String,
-    stock: Number,
+    countInStock: Number,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
