@@ -38,4 +38,5 @@ const sendOrderConfirmationEmail = async (to, name, order) => {
  
 };
 
+
 module.exports = sendOrderConfirmationEmail;

@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// ✅ Define protect first
+// ✅ Protect route - verify JWT
 const protect = async (req, res, next) => {
   let token;
 
@@ -19,10 +19,12 @@ const protect = async (req, res, next) => {
     }
   }
 
-  return res.status(401).json({ message: "Not authorized, no token" });
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized, no token" });
+  }
 };
 
-// ✅ Optional: isAdmin middleware
+// ✅ Admin middleware
 const isAdmin = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
     return next();
@@ -30,5 +32,28 @@ const isAdmin = (req, res, next) => {
   return res.status(403).json({ message: "Access denied: Admins only" });
 };
 
-// ✅ Export both
-module.exports = { protect, isAdmin };
+// ✅ Delivery boy middleware
+const isDeliveryBoy = (req, res, next) => {
+  if (req.user && req.user.role === "delivery") {
+    return next();
+  }
+  return res.status(403).json({ message: "Access denied: Delivery personnel only" });
+};
+
+// ✅ Admin OR Delivery boy middleware
+const isAdminOrDeliveryBoy = (req, res, next) => {
+  if (req.user && (req.user.role === "admin" || req.user.role === "delivery")) {
+    return next();
+  }
+  return res.status(403).json({ 
+    message: "Access denied: Requires admin or delivery privileges" 
+  });
+};
+
+// ✅ Export all middleware
+module.exports = { 
+  protect, 
+  isAdmin, 
+  isDeliveryBoy, 
+  isAdminOrDeliveryBoy 
+};

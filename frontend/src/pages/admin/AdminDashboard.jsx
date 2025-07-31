@@ -6,6 +6,7 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
+  const [deliveryBoys, setDeliveryBoys] = useState([]);
 
   useEffect(() => {
     if (user?.role !== "admin") return;
@@ -14,8 +15,11 @@ export default function AdminDashboard() {
       try {
         const ordersRes = await API.get("/orders");
         const productsRes = await API.get("/products");
+        const deliveryBoysRes = await API.get("/users?role=delivery");
+
         setOrders(ordersRes.data);
         setProducts(productsRes.data);
+        setDeliveryBoys(deliveryBoysRes.data);
       } catch (err) {
         console.error("Admin fetch error", err);
       }
@@ -27,18 +31,77 @@ export default function AdminDashboard() {
   const markDelivered = async (id) => {
     try {
       await API.put(`/orders/${id}/deliver`);
-      setOrders(orders.map(order =>
-        order._id === id ? { ...order, isDelivered: true, deliveredAt: new Date() } : order
-      ));
+      setOrders((prev) =>
+        prev.map((order) =>
+          order._id === id ? { ...order, isDelivered: true, deliveredAt: new Date() } : order
+        )
+      );
     } catch (err) {
       alert("Failed to mark as delivered");
     }
   };
 
+  const assignOrder = async (orderId, deliveryBoyId) => {
+    try {
+      await API.put(`/orders/${orderId}/assign`, { deliveryBoyId });
+      alert("Assigned successfully");
+    } catch (err) {
+      alert("Failed to assign delivery boy");
+    }
+  };
+
+  // 📅 Monthly stats
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+
+  const monthlyOrderTotal = orders
+    .filter((o) => {
+      const d = new Date(o.createdAt);
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    })
+    .reduce((sum, o) => sum + o.totalPrice, 0);
+
+  const monthlyProductTotal = products
+    .filter((p) => {
+      const d = new Date(p.createdAt);
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    })
+    .reduce((sum, p) => sum + p.price, 0);
+
+  const categoryCounts = products.reduce((acc, p) => {
+    acc[p.category] = (acc[p.category] || 0) + 1;
+    return acc;
+  }, {});
+
   return (
     <div>
       <h2>Admin Dashboard</h2>
 
+      {/* Monthly Stats */}
+      <div className="row my-4">
+        <div className="col-md-4">
+          <div className="alert alert-info shadow-sm">
+            📦 <strong>Total Orders This Month:</strong> ₹{monthlyOrderTotal}
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="alert alert-success shadow-sm">
+            🛍️ <strong>Total Product This Month:</strong> ₹{monthlyProductTotal}
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="alert alert-warning shadow-sm">
+            📊 <strong>Category Counts:</strong>
+            <ul className="mb-0 mt-1 ps-3">
+              {Object.entries(categoryCounts).map(([cat, count]) => (
+                <li key={cat}>{cat}: {count}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Orders Table */}
       <h4 className="mt-4">All Orders</h4>
       <table className="table table-bordered table-sm">
         <thead>
@@ -48,6 +111,7 @@ export default function AdminDashboard() {
             <th>Total</th>
             <th>Payment</th>
             <th>Delivery</th>
+            <th>Assign</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -58,10 +122,31 @@ export default function AdminDashboard() {
               <td>{o.user?.name}</td>
               <td>₹{o.totalPrice}</td>
               <td>{o.isPaid ? "Paid" : "COD"}</td>
-              <td>{o.isDelivered ? "Delivered" : "Pending"}</td>
+              <td>
+                {o.isDelivered
+                  ? `Delivered (${new Date(o.deliveredAt).toLocaleDateString()})`
+                  : "Pending"}
+              </td>
               <td>
                 {!o.isDelivered && (
-                  <button onClick={() => markDelivered(o._id)} className="btn btn-sm btn-success">
+                  <select
+                    className="form-select form-select-sm"
+                    defaultValue=""
+                    onChange={(e) => assignOrder(o._id, e.target.value)}
+                  >
+                    <option value="" disabled>Select Delivery Boy</option>
+                    {deliveryBoys.map((boy) => (
+                      <option key={boy._id} value={boy._id}>{boy.name}</option>
+                    ))}
+                  </select>
+                )}
+              </td>
+              <td>
+                {!o.isDelivered && (
+                  <button
+                    onClick={() => markDelivered(o._id)}
+                    className="btn btn-sm btn-success"
+                  >
                     Mark Delivered
                   </button>
                 )}
@@ -71,6 +156,7 @@ export default function AdminDashboard() {
         </tbody>
       </table>
 
+      {/* Products Table */}
       <h4 className="mt-4">All Products</h4>
       <table className="table table-bordered table-sm">
         <thead>

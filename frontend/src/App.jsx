@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -14,21 +14,23 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProductsPage from "./pages/admin/AdminProductsPage";
 import AddProductPage from "./pages/admin/AddProductPage";
 import EditProductPage from "./pages/admin/EditProductPage";
+import RegisterDeliveryBoy from "./pages/admin/RegisterDeliveryBoy";
+
+import DeliveryDashboard from "./pages/Delivery/DeliveryDashboard";
 
 import { useAuth } from "./context/AuthContext";
-import { Navigate } from "react-router-dom";
 
 function App() {
   const { user } = useAuth();
 
-  // Optional: Protect routes
-  const PrivateRoute = ({ children }) => {
-    return user ? children : <Navigate to="/login" />;
-  };
+  const PrivateRoute = ({ children }) =>
+    user ? children : <Navigate to="/login" />;
 
-  const AdminRoute = ({ children }) => {
-    return user?.role === "admin" ? children : <Navigate to="/" />;
-  };
+  const AdminRoute = ({ children }) =>
+    user?.role === "admin" ? children : <Navigate to="/" />;
+
+  const DeliveryRoute = ({ children }) =>
+    user?.role === "delivery" ? children : <Navigate to="/login" />;
 
   return (
     <>
@@ -37,9 +39,9 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/product/:id" element={<ProductDetailsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/product/:id" element={<ProductDetailsPage />} />
 
           {/* User Routes */}
           <Route path="/cart" element={<CartPage />} />
@@ -51,6 +53,14 @@ function App() {
           <Route path="/admin/products" element={<AdminRoute><AdminProductsPage /></AdminRoute>} />
           <Route path="/admin/products/add" element={<AdminRoute><AddProductPage /></AdminRoute>} />
           <Route path="/admin/products/edit/:id" element={<AdminRoute><EditProductPage /></AdminRoute>} />
+          <Route path="/admin/register-delivery" element={<AdminRoute><RegisterDeliveryBoy /></AdminRoute>} />
+
+          {/* Delivery Boy Route */}
+         <Route
+  path="/delivery/dashboard"
+  element={<DeliveryRoute><DeliveryDashboard /></DeliveryRoute>}
+/>
+
         </Routes>
       </div>
       <Footer />

@@ -1,21 +1,20 @@
 const express = require("express");
 const router = express.Router();
+const orderController = require("../controllers/orderController");
+const { protect, isAdmin, isDeliveryBoy, isAdminOrDeliveryBoy } = require("../middleware/authMiddleware");
 
-const {
-  placeOrder,
-  getMyOrders,
-  getAllOrders,
-  markAsDelivered,
-} = require("../controllers/orderController");
+// User routes
+router.post("/", protect, orderController.placeOrder);
+router.get("/my", protect, orderController.getMyOrders);
 
-const { protect, isAdmin } = require("../middleware/authMiddleware");
+// Admin routes
+router.get("/", protect, isAdmin, orderController.getAllOrders);
+router.put("/:id/assign", protect, isAdmin, orderController.assignOrder);
 
-// ✅ User routes
-router.post("/", protect, placeOrder);
-router.get("/my", protect, getMyOrders);
+// Delivery routes
+router.get("/delivery/assigned", protect, isDeliveryBoy, orderController.getAssignedOrders);
 
-// ✅ Admin routes
-router.get("/", protect, isAdmin, getAllOrders);
-router.put("/:id/deliver", protect, isAdmin, markAsDelivered);
+// Shared delivery status update
+router.put("/:id/deliver", protect, isAdminOrDeliveryBoy, orderController.markAsDelivered);
 
 module.exports = router;

@@ -79,3 +79,34 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.registerDeliveryBoy = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ message: "Email already in use" });
+    }
+
+    const deliveryBoy = await User.create({
+      name,
+      email,
+      password, // Password is hashed via pre-save in model
+      role: "delivery",
+    });
+
+    res.status(201).json({
+      message: "Delivery boy registered successfully",
+      user: {
+        _id: deliveryBoy._id,
+        name: deliveryBoy.name,
+        email: deliveryBoy.email,
+        role: deliveryBoy.role,
+      },
+    });
+  } catch (err) {
+    console.error("❌ Delivery register error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};

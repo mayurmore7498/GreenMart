@@ -1,4 +1,4 @@
-// models/Order.js
+// backend/models/Order.js
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
@@ -28,6 +28,18 @@ const orderSchema = new mongoose.Schema({
   },
   paymentMethod: String,
   totalPrice: Number,
+
+  // ✅ Delivery fields
+  assignedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // delivery boy
+    default: null,
+  },
+  isDelivered: {
+    type: Boolean,
+    default: false,
+  },
+  deliveredAt: Date,
 }, {
   timestamps: true,
 });

@@ -32,13 +32,13 @@ export default function Navbar() {
               </Link>
             </li>
 
-            {user && user.role === "user" && (
+            {user?.role === "user" && (
               <li className="nav-item">
                 <Link className="nav-link" to="/my-orders">My Orders</Link>
               </li>
             )}
 
-            {user && user.role === "admin" && (
+            {user?.role === "admin" && (
               <li className="nav-item dropdown">
                 <span className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown">
                   Admin
@@ -50,7 +50,16 @@ export default function Navbar() {
                   <li>
                     <Link className="dropdown-item" to="/admin/products">Manage Products</Link>
                   </li>
+                  <li>
+                    <Link className="dropdown-item" to="/admin/register-delivery">Add Delivery Boy</Link>
+                  </li>
                 </ul>
+              </li>
+            )}
+
+            {user?.role === "delivery" && (
+              <li className="nav-item">
+                <Link className="nav-link"  to="/delivery/dashboard">Delivery Dashboard</Link>
               </li>
             )}
           </ul>
