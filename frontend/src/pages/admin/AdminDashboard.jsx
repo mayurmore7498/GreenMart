@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [deliveryBoys, setDeliveryBoys] = useState([]);
@@ -33,7 +34,9 @@ export default function AdminDashboard() {
       await API.put(`/orders/${id}/deliver`);
       setOrders((prev) =>
         prev.map((order) =>
-          order._id === id ? { ...order, isDelivered: true, deliveredAt: new Date() } : order
+          order._id === id
+            ? { ...order, isDelivered: true, deliveredAt: new Date() }
+            : order
         )
       );
     } catch (err) {
@@ -41,7 +44,6 @@ export default function AdminDashboard() {
     }
   };
 
-<<<<<<< HEAD
   const assignOrder = async (orderId, deliveryBoyId) => {
     try {
       await API.put(`/orders/${orderId}/assign`, { deliveryBoyId });
@@ -51,17 +53,11 @@ export default function AdminDashboard() {
     }
   };
 
-  // 📅 Monthly stats
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
-
-=======
   // 📅 Current Month & Year
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
 
   // 💰 Monthly Order Total
->>>>>>> ee83da2861386e09f9650cd7c3b812a40efc8d56
   const monthlyOrderTotal = orders
     .filter((o) => {
       const d = new Date(o.createdAt);
@@ -69,10 +65,7 @@ export default function AdminDashboard() {
     })
     .reduce((sum, o) => sum + o.totalPrice, 0);
 
-<<<<<<< HEAD
-=======
-  // 💰 Monthly Product Price Total (created this month)
->>>>>>> ee83da2861386e09f9650cd7c3b812a40efc8d56
+  // 💰 Monthly Product Total (created this month)
   const monthlyProductTotal = products
     .filter((p) => {
       const d = new Date(p.createdAt);
@@ -80,10 +73,7 @@ export default function AdminDashboard() {
     })
     .reduce((sum, p) => sum + p.price, 0);
 
-<<<<<<< HEAD
-=======
   // 📊 Product Count by Category
->>>>>>> ee83da2861386e09f9650cd7c3b812a40efc8d56
   const categoryCounts = products.reduce((acc, p) => {
     acc[p.category] = (acc[p.category] || 0) + 1;
     return acc;
@@ -93,43 +83,35 @@ export default function AdminDashboard() {
     <div>
       <h2>Admin Dashboard</h2>
 
-<<<<<<< HEAD
-      {/* Monthly Stats */}
-=======
       {/* 🧾 Monthly Reports */}
->>>>>>> ee83da2861386e09f9650cd7c3b812a40efc8d56
       <div className="row my-4">
         <div className="col-md-4">
           <div className="alert alert-info shadow-sm">
             📦 <strong>Total Orders This Month:</strong> ₹{monthlyOrderTotal}
           </div>
         </div>
+
         <div className="col-md-4">
           <div className="alert alert-success shadow-sm">
-<<<<<<< HEAD
             🛍️ <strong>Total Product This Month:</strong> ₹{monthlyProductTotal}
-=======
-            🛍️ <strong>Total Product  This Month:</strong> {monthlyProductTotal}
->>>>>>> ee83da2861386e09f9650cd7c3b812a40efc8d56
           </div>
         </div>
+
         <div className="col-md-4">
           <div className="alert alert-warning shadow-sm">
             📊 <strong>Category Counts:</strong>
             <ul className="mb-0 mt-1 ps-3">
               {Object.entries(categoryCounts).map(([cat, count]) => (
-                <li key={cat}>{cat}: {count}</li>
+                <li key={cat}>
+                  {cat}: {count}
+                </li>
               ))}
             </ul>
           </div>
         </div>
       </div>
 
-<<<<<<< HEAD
-      {/* Orders Table */}
-=======
       {/* 📋 Orders Table */}
->>>>>>> ee83da2861386e09f9650cd7c3b812a40efc8d56
       <h4 className="mt-4">All Orders</h4>
       <table className="table table-bordered table-sm">
         <thead>
@@ -150,25 +132,27 @@ export default function AdminDashboard() {
               <td>{o.user?.name}</td>
               <td>₹{o.totalPrice}</td>
               <td>{o.isPaid ? "Paid" : "COD"}</td>
-<<<<<<< HEAD
               <td>
                 {o.isDelivered
                   ? `Delivered (${new Date(o.deliveredAt).toLocaleDateString()})`
                   : "Pending"}
               </td>
-=======
-              <td>{o.isDelivered ? `Delivered (${new Date(o.deliveredAt).toLocaleDateString()})` : "Pending"}</td>
->>>>>>> ee83da2861386e09f9650cd7c3b812a40efc8d56
               <td>
                 {!o.isDelivered && (
                   <select
                     className="form-select form-select-sm"
                     defaultValue=""
-                    onChange={(e) => assignOrder(o._id, e.target.value)}
+                    onChange={(e) =>
+                      assignOrder(o._id, e.target.value)
+                    }
                   >
-                    <option value="" disabled>Select Delivery Boy</option>
+                    <option value="" disabled>
+                      Select Delivery Boy
+                    </option>
                     {deliveryBoys.map((boy) => (
-                      <option key={boy._id} value={boy._id}>{boy.name}</option>
+                      <option key={boy._id} value={boy._id}>
+                        {boy.name}
+                      </option>
                     ))}
                   </select>
                 )}
@@ -188,11 +172,7 @@ export default function AdminDashboard() {
         </tbody>
       </table>
 
-<<<<<<< HEAD
-      {/* Products Table */}
-=======
       {/* 📦 Products Table */}
->>>>>>> ee83da2861386e09f9650cd7c3b812a40efc8d56
       <h4 className="mt-4">All Products</h4>
       <table className="table table-bordered table-sm">
         <thead>
