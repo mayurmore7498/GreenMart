@@ -1,4 +1,4 @@
-// backend/routes/productRoutes.js
+
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
@@ -10,10 +10,9 @@ const {
 } = require("../controllers/productController");
 const { protect, isAdmin } = require("../middleware/authMiddleware");
 
-// Public route - fetch all products
 router.get("/", getAllProducts);
 
-// Admin routes
+
 router.post("/", protect, isAdmin, createProduct);
 router.put("/:id", protect, isAdmin, updateProduct);
 router.delete("/:id", protect, isAdmin, deleteProduct);
@@ -23,7 +22,7 @@ router.get("/", async (req, res) => {
   res.json(products);
 });
 
-// ✅ Get single product by ID
+
 router.get("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);

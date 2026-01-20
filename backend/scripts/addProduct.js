@@ -11,6 +11,6 @@ mongoose.connect("mongodb://localhost:27017/greenmart").then(async () => {
     image: "https://example.com/apple.jpg",
     stock: 100,
   });
-  console.log("✅ Product inserted");
+  console.log(" Product inserted");
   process.exit();
 });
