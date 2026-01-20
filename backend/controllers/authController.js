@@ -49,35 +49,39 @@ exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // ✅ validation
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });
     }
 
+    // ✅ find user
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // ✅ USE MODEL METHOD
+    // ✅ SAFE password compare
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
+    // ✅ create token
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
+    // ✅ success response
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
-      token,
+      token
     });
 
   } catch (err) {
