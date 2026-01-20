@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://greenmart-backend.onrender.com/api",
+  baseURL: "https://greenmart-4nwp.onrender.com/api",
 });
 
 // Auto-attach token
