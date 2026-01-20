@@ -46,21 +46,25 @@ exports.registerUser = async (req, res) => {
 // @route   POST /api/auth/login
 // @access  Public
 exports.loginUser = async (req, res) => {
-  const { email, password } = req.body;
-  console.log("💡 Login request:", email);
-
   try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password required" });
+    }
+
     const user = await User.findOne({ email });
-    console.log("🧠 User from DB:", user);
 
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    console.log("Entered:", password);
-    console.log("Stored :", user.password);
-    console.log("Match? :", isMatch);
+    // ✅ USE MODEL METHOD
+    const isMatch = await user.matchPassword(password);
 
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
 
     const token = jwt.sign(
       { userId: user._id, role: user.role },
@@ -73,10 +77,11 @@ exports.loginUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      token
+      token,
     });
+
   } catch (err) {
-    console.error("❌ Login error:", err.message);
+    console.error("LOGIN ERROR ❌", err);
     res.status(500).json({ message: "Server error" });
   }
 };
