@@ -43,9 +43,9 @@ export default function ProductDetailsPage() {
 
           <h3 className="text-success fw-bold mb-3">₹{product.price}</h3>
 
-          <p className={`fw-semibold ${product.countInStock > 0 ? "text-success" : "text-danger"}`}>
-            {product.countInStock > 0 ? "In Stock" : "Out of Stock"}
-          </p>
+          <p className={`${product.countInStock > 0 ? "text-success" : "text-danger"}`}>
+  {product.countInStock > 0 ? "In Stock" : "Out of Stock"}
+</p>
 
           <button
             className="btn btn-success px-4 py-2 mt-3"
